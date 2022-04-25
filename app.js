@@ -8,6 +8,21 @@ const ExpressError = require("./expressError")
 
 app.use(express.json());
 
+// user companies routes
+const companyRoutes = require("./routes/companies")
+app.use('/companies', companyRoutes)
+
+// use invoice router
+const invoicesRouter = require("./routes/invoices")
+app.use('/invoices', invoicesRouter)
+
+
+
+
+
+
+
+
 
 /** 404 handler */
 
