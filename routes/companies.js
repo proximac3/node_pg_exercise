@@ -3,6 +3,7 @@ const app = require("../app");
 const router = new express.Router();
 const ExpressError = require("../expressError")
 const db = require('../db')
+const slugify = require('slugify');
 
 router.get('/', async (req, res) => {
     // get list of companie from DB
@@ -32,10 +33,12 @@ router.get('/:code', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
     // Add Company
     try {
-        const { code, name, description } = req.body
-        const results = await db.query('INSERT INTO companies(code, name, description) VALUES($1, $2, $3) RETURNING code, name, description', [code, name, description])
+        const { name, description } = req.body
+        const slug = slugify(name, { replacements: '-', lower: true,remove: /[*+~.()'"!:@#^_%$&]/g, strict: true})
 
-        if (code.length < 1 || name.length < 1 || description.length < 1) {
+        const results = await db.query('INSERT INTO companies(code, name, description) VALUES($1, $2, $3) RETURNING code, name, description', [slug, name, description])
+
+        if (name.length < 1 || description.length < 1) {
             throw new ExpressError('code, name, and description must be specified', 404)
         } else {
             return res.status(201).json({ company: results.rows[0] })

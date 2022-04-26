@@ -4,9 +4,11 @@ const ExpressError = require("../expressError")
 const db = require('../db');
 
 
+
 invoiceRouter.get('/', async (req, res, next) => {
     // get a invoices
     const response = await db.query('SELECT * FROM invoices')
+    
     return res.send({invoices: response.rows})
 })
 
@@ -38,7 +40,7 @@ invoiceRouter.put('/:comp_code', async (req, res, next) => {
         const response = await db.query("UPDATE invoices SET amt=$1, paid=$2 WHERE comp_code=$3 RETURNING comp_code, amt, paid", [amt, paid, comp_code])
 
         if (response.rows.length === 0) {
-            return res.json({message: "cannot find inivoice"})
+            return res.status(404).json({message: "cannot find inivoice"})
         } else {
             return res.json({message: response.rows[0]})
         }
